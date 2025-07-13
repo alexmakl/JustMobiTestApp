@@ -9,15 +9,14 @@ import UIKit
 
 protocol MainViewProtocol: AnyObject {
     func showData(tagsTitle: String)
+    func showImages()
 }
 
 final class MainViewController: UIViewController, MainViewProtocol {
 
-    var presenter: MainPresenterProtocol?
-    
+    private var presenter: MainPresenterProtocol!
     private var tagsCollectionView: UICollectionView!
-    private var tags: [Tag] = []
-    
+    private var imagesCollectionView: UICollectionView!
     private let promoView = BannerView()
     
     private lazy var tagsLabel: UILabel = {
@@ -40,6 +39,10 @@ final class MainViewController: UIViewController, MainViewProtocol {
         updateTags()
     }
 
+    func showImages() {
+        imagesCollectionView.reloadData()
+    }
+
     private func setupUI() {
         navigationController?.navigationBar.isHidden = true
         
@@ -51,6 +54,7 @@ final class MainViewController: UIViewController, MainViewProtocol {
         promoView.translatesAutoresizingMaskIntoConstraints = false
         tagsLabel.translatesAutoresizingMaskIntoConstraints = false
         tagsCollectionView.translatesAutoresizingMaskIntoConstraints = false
+        imagesCollectionView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             promoView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -64,7 +68,12 @@ final class MainViewController: UIViewController, MainViewProtocol {
             tagsCollectionView.topAnchor.constraint(equalTo: tagsLabel.bottomAnchor, constant: 8),
             tagsCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             tagsCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tagsCollectionView.heightAnchor.constraint(equalToConstant: 25)
+            tagsCollectionView.heightAnchor.constraint(equalToConstant: 25),
+            
+            imagesCollectionView.topAnchor.constraint(equalTo: tagsCollectionView.bottomAnchor, constant: 8),
+            imagesCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
+            imagesCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
+            imagesCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
     
@@ -72,10 +81,12 @@ final class MainViewController: UIViewController, MainViewProtocol {
         view.backgroundColor = .systemBackground
         
         setupTagsCollectionView()
+        setupImagesCollectionView()
         
         view.addSubview(promoView)
         view.addSubview(tagsLabel)
         view.addSubview(tagsCollectionView)
+        view.addSubview(imagesCollectionView)
     }
     
     private func setupTagsCollectionView() {
@@ -91,23 +102,60 @@ final class MainViewController: UIViewController, MainViewProtocol {
         tagsCollectionView.register(TagCell.self, forCellWithReuseIdentifier: TagCell.reuseIdentifier)
     }
 
+    private func setupImagesCollectionView() {
+        imagesCollectionView = UICollectionView(frame: .zero, collectionViewLayout: CustomLayout())
+        imagesCollectionView.backgroundColor = .clear
+        imagesCollectionView.showsVerticalScrollIndicator = false
+        imagesCollectionView.dataSource = self
+        imagesCollectionView.delegate = self
+        imagesCollectionView.register(ImageCell.self, forCellWithReuseIdentifier: ImageCell.reuseIdentifier)
+        if let customLayout = imagesCollectionView.collectionViewLayout as? CustomLayout {
+            customLayout.invalidateLayout()
+        }
+    }
+
     private func updateTags() {
         tagsCollectionView.reloadData()
     }
 }
 
 extension MainViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return presenter?.tagsCount ?? 0
+        if collectionView == tagsCollectionView {
+            return presenter.tagsCount
+        } else {
+            return presenter.imagesCount
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TagCell.reuseIdentifier, for: indexPath) as? TagCell else {
-            return UICollectionViewCell()
+        if collectionView == tagsCollectionView {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TagCell.reuseIdentifier, for: indexPath) as? TagCell else {
+                return UICollectionViewCell()
+            }
+            let tag = presenter.tag(at: indexPath.item)
+            cell.configure(with: tag)
+            return cell
+        } else {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ImageCell.reuseIdentifier, for: indexPath) as? ImageCell else {
+                return UICollectionViewCell()
+            }
+            let photo = presenter.getImage(at: indexPath.item)
+            
+            cell.configure(with: photo)
+            return cell
         }
-        let tag = presenter?.tag(at: indexPath.item)
-        cell.configure(with: tag)
-        return cell
     }
 }
 
+extension MainViewController: CustomLayoutDelegate {
+    
+    func collectionView(_ collectionView: UICollectionView, heightForItemAt indexPath: IndexPath, with width: CGFloat) -> CGFloat {
+        let image = presenter.getImage(at: indexPath.item)
+        let ratio = image.size.height / image.size.width
+        let minRatio: CGFloat = 1.3
+        let height = width * max(ratio, minRatio)
+        return height
+    }
+}
