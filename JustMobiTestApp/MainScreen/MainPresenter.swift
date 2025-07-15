@@ -44,7 +44,8 @@ final class MainPresenter: MainPresenterProtocol {
     
     func loadData() {
         tags = loadTags()
-        view?.showData(tagsTitle: "Подходит для:")
+        let banner = Banner(title: "Try three days free trial", description: "You will get all premium template, additional stickers and no ads")
+        view?.showData(banner: banner, tagsTitle: "Подходит для:")
         loadImages()
     }
     

@@ -8,7 +8,7 @@
 import UIKit
 
 protocol MainViewProtocol: AnyObject {
-    func showData(tagsTitle: String)
+    func showData(banner: Banner, tagsTitle: String)
     func showImages()
 }
 
@@ -17,7 +17,7 @@ final class MainViewController: UIViewController, MainViewProtocol {
     private var presenter: MainPresenterProtocol!
     private var tagsCollectionView: UICollectionView!
     private var imagesCollectionView: UICollectionView!
-    private let promoView = BannerView()
+    private let bannerView = BannerView()
     private let giftView = GiftView(timerFontSize: 12)
     
     private lazy var tagsLabel: UILabel = {
@@ -39,7 +39,9 @@ final class MainViewController: UIViewController, MainViewProtocol {
         observeWillEnterForeground()
     }
     
-    func showData(tagsTitle: String) {
+    func showData(banner: Banner, tagsTitle: String) {
+        bannerView.titleText = banner.title
+        bannerView.descriptionText = banner.description
         tagsLabel.text = tagsTitle
         updateTags()
     }
@@ -61,7 +63,7 @@ final class MainViewController: UIViewController, MainViewProtocol {
         setupTagsCollectionView()
         setupImagesCollectionView()
         
-        view.addSubview(promoView)
+        view.addSubview(bannerView)
         view.addSubview(tagsLabel)
         view.addSubview(tagsCollectionView)
         view.addSubview(imagesCollectionView)
@@ -69,18 +71,18 @@ final class MainViewController: UIViewController, MainViewProtocol {
     }
     
     private func configureConstraints() {
-        promoView.translatesAutoresizingMaskIntoConstraints = false
+        bannerView.translatesAutoresizingMaskIntoConstraints = false
         tagsLabel.translatesAutoresizingMaskIntoConstraints = false
         tagsCollectionView.translatesAutoresizingMaskIntoConstraints = false
         imagesCollectionView.translatesAutoresizingMaskIntoConstraints = false
         giftView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            promoView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            promoView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            promoView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            bannerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            bannerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            bannerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             
-            tagsLabel.topAnchor.constraint(equalTo: promoView.bottomAnchor, constant: 15),
+            tagsLabel.topAnchor.constraint(equalTo: bannerView.bottomAnchor, constant: 15),
             tagsLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             tagsLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             
