@@ -18,6 +18,7 @@ final class MainViewController: UIViewController, MainViewProtocol {
     private var tagsCollectionView: UICollectionView!
     private var imagesCollectionView: UICollectionView!
     private let promoView = BannerView()
+    private let giftView = GiftView(timerFontSize: 12)
     
     private lazy var tagsLabel: UILabel = {
         let label = UILabel()
@@ -32,6 +33,10 @@ final class MainViewController: UIViewController, MainViewProtocol {
         
         setupUI()
         presenter?.loadData()
+        
+        giftView.startTimer(seconds: 14)
+        giftView.startShaking()
+        observeWillEnterForeground()
     }
     
     func showData(tagsTitle: String) {
@@ -50,11 +55,25 @@ final class MainViewController: UIViewController, MainViewProtocol {
         configureConstraints()
     }
     
+    private func configureViews() {
+        view.backgroundColor = .systemBackground
+        
+        setupTagsCollectionView()
+        setupImagesCollectionView()
+        
+        view.addSubview(promoView)
+        view.addSubview(tagsLabel)
+        view.addSubview(tagsCollectionView)
+        view.addSubview(imagesCollectionView)
+        view.addSubview(giftView)
+    }
+    
     private func configureConstraints() {
         promoView.translatesAutoresizingMaskIntoConstraints = false
         tagsLabel.translatesAutoresizingMaskIntoConstraints = false
         tagsCollectionView.translatesAutoresizingMaskIntoConstraints = false
         imagesCollectionView.translatesAutoresizingMaskIntoConstraints = false
+        giftView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             promoView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -73,20 +92,13 @@ final class MainViewController: UIViewController, MainViewProtocol {
             imagesCollectionView.topAnchor.constraint(equalTo: tagsCollectionView.bottomAnchor, constant: 8),
             imagesCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
             imagesCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
-            imagesCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            imagesCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            giftView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            giftView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -8),
+            giftView.widthAnchor.constraint(equalToConstant: 88),
+            giftView.heightAnchor.constraint(equalToConstant: 88)
         ])
-    }
-    
-    private func configureViews() {
-        view.backgroundColor = .systemBackground
-        
-        setupTagsCollectionView()
-        setupImagesCollectionView()
-        
-        view.addSubview(promoView)
-        view.addSubview(tagsLabel)
-        view.addSubview(tagsCollectionView)
-        view.addSubview(imagesCollectionView)
     }
     
     private func setupTagsCollectionView() {
@@ -116,6 +128,23 @@ final class MainViewController: UIViewController, MainViewProtocol {
 
     private func updateTags() {
         tagsCollectionView.reloadData()
+    }
+    
+    private func observeWillEnterForeground() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(appWillEnterForeground),
+            name: UIApplication.willEnterForegroundNotification,
+            object: nil
+        )
+    }
+    
+    @objc private func appWillEnterForeground() {
+        giftView.startShaking()
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 }
 
