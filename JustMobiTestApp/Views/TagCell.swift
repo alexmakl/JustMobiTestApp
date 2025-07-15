@@ -12,7 +12,7 @@ final class TagCell: UICollectionViewCell {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 11, weight: .semibold)
+        label.font = .systemFont(ofSize: 11, weight: .semibold)
         label.textColor = .accent
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false

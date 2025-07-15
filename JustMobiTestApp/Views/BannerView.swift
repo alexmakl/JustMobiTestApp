@@ -43,7 +43,7 @@ final class BannerView: UIView {
         iv.clipsToBounds = true
         iv.layer.cornerRadius = 3
         iv.layer.borderWidth = 2
-        iv.layer.borderColor = CGColor(red: 1, green: 1, blue: 1, alpha: 1)
+        iv.layer.borderColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1).cgColor
         iv.translatesAutoresizingMaskIntoConstraints = false
         return iv
     }

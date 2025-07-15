@@ -37,7 +37,7 @@ final class GiftView: UIView {
     
     init(timerFontSize: CGFloat = 22) {
         super.init(frame: .zero)
-        timerLabel.font = UIFont.systemFont(ofSize: timerFontSize, weight: .semibold)
+        timerLabel.font = .systemFont(ofSize: timerFontSize, weight: .semibold)
         setupUI()
     }
     

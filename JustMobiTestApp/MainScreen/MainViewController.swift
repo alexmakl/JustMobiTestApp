@@ -23,7 +23,7 @@ final class MainViewController: UIViewController, MainViewProtocol {
     private lazy var tagsLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .regular)
-        label.textColor = .label
+        label.textColor = .black
         return label
     }()
     
@@ -56,7 +56,7 @@ final class MainViewController: UIViewController, MainViewProtocol {
     }
     
     private func configureViews() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .white
         
         setupTagsCollectionView()
         setupImagesCollectionView()
@@ -86,7 +86,7 @@ final class MainViewController: UIViewController, MainViewProtocol {
             
             tagsCollectionView.topAnchor.constraint(equalTo: tagsLabel.bottomAnchor, constant: 8),
             tagsCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            tagsCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tagsCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             tagsCollectionView.heightAnchor.constraint(equalToConstant: 25),
             
             imagesCollectionView.topAnchor.constraint(equalTo: tagsCollectionView.bottomAnchor, constant: 8),
@@ -112,6 +112,7 @@ final class MainViewController: UIViewController, MainViewProtocol {
         tagsCollectionView.dataSource = self
         tagsCollectionView.delegate = self
         tagsCollectionView.register(TagCell.self, forCellWithReuseIdentifier: TagCell.reuseIdentifier)
+        tagsCollectionView.clipsToBounds = false
     }
 
     private func setupImagesCollectionView() {
