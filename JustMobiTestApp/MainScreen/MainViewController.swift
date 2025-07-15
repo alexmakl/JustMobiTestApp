@@ -34,7 +34,7 @@ final class MainViewController: UIViewController, MainViewProtocol {
         setupUI()
         presenter?.loadData()
         
-        giftView.startTimer(seconds: 14)
+        giftView.startTimer(seconds: 24*60 + 14)
         giftView.startShaking()
         observeWillEnterForeground()
     }
